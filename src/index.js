@@ -74,7 +74,7 @@ const q = query(
 
 // Real time listener to changes on the collection
 // and firing the cb function with a snapshot of the updated data
-onSnapshot(colRef, (snapshot) => {
+const unsubCol = onSnapshot(colRef, (snapshot) => {
   // we put q instead of colRef to perform a query
   let books = [];
   snapshot.docs.forEach((doc) => {
@@ -118,7 +118,7 @@ getDoc(docRef).then((doc) => {
   console.log(doc.data(), doc.id);
 });
 
-onSnapshot(docRef, (doc) => {
+const unsubDoc = onSnapshot(docRef, (doc) => {
   // to keep listening to that document changes
   console.log(doc.data(), doc.id);
 });
@@ -185,6 +185,16 @@ loginForm.addEventListener("submit", (e) => {
 });
 
 // subscribing to auth changes, function will fire on each login/signup or logout
-onAuthStateChanged(auth, (user) => {
+const unsubAuth = onAuthStateChanged(auth, (user) => {
   console.log("user status changed: ", user);
+});
+
+// All subscription (snapshot) return an unsubscribe function that can be stored
+// unsubscribing from changes (auth & db)
+const unsubButton = document.querySelector(".unsub");
+unsubButton.addEventListener("click", () => {
+  console.log("unsubscribing");
+  unsubAuth();
+  unsubCol();
+  unsubAuth();
 });
