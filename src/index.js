@@ -15,6 +15,8 @@ import {
   addDoc,
   deleteDoc,
   doc, // reference to a document
+  query,
+  where,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -34,6 +36,10 @@ const db = getFirestore();
 
 // collection ref
 const colRef = collection(db, "books");
+
+// queries
+const q = query(colRef, where("author", "==", "Angela"));
+// we place the q as the first parameter to onSnapshot function to get the result
 
 // get the collection data only once (snapshot at the exact time only)
 // getDocs(colRef)
