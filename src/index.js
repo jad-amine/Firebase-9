@@ -17,6 +17,9 @@ import {
   doc, // reference to a document
   query,
   where,
+  orderBy,
+  serverTimestamp,
+  getDoc,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -38,7 +41,12 @@ const db = getFirestore();
 const colRef = collection(db, "books");
 
 // queries
-const q = query(colRef, where("author", "==", "Angela"));
+const q = query(
+  colRef,
+  orderBy("createdAt") // by default ascending
+  // where("author", "==", "Angela"),
+  // orderBy("title", "asc")
+);
 // we place the q as the first parameter to onSnapshot function to get the result
 
 // get the collection data only once (snapshot at the exact time only)
@@ -57,6 +65,7 @@ const q = query(colRef, where("author", "==", "Angela"));
 // Real time listener to changes on the collection
 // and firing the cb function with a snapshot of the updated data
 onSnapshot(colRef, (snapshot) => {
+  // we put q instead of colRef to perform a query
   let books = [];
   snapshot.docs.forEach((doc) => {
     books.push({ ...doc.data(), id: doc.id });
@@ -72,6 +81,7 @@ addBookForm.addEventListener("submit", (e) => {
   addDoc(colRef, {
     title: addBookForm.title.value,
     author: addBookForm.author.value,
+    createdAt: serverTimestamp(),
   }).then(() => {
     // clear input fields
     addBookForm.reset();
@@ -88,4 +98,17 @@ deleteBookForm.addEventListener("submit", (e) => {
   deleteDoc(docRef).then(() => {
     deleteBookForm.reset();
   });
+});
+
+// get a single document
+const docRef = doc(db, "books", "P11wBHyTqowjWfXalozz");
+
+getDoc(docRef).then((doc) => {
+  // to get it one time
+  console.log(doc.data(), doc.id);
+});
+
+onSnapshot(docRef, (doc) => {
+  // to keep listening to that document changes
+  console.log(doc.data(), doc.id);
 });
