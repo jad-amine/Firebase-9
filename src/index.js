@@ -10,7 +10,8 @@ import { initializeApp } from "firebase/app";
 import {
   getFirestore,
   collection,
-  getDocs,
+  getDocs, // grab the data one time
+  onSnapshot, // real time listener
   addDoc,
   deleteDoc,
   doc, // reference to a document
@@ -34,18 +35,28 @@ const db = getFirestore();
 // collection ref
 const colRef = collection(db, "books");
 
-// get the collection data (snapshot of that collection at that time)
-getDocs(colRef)
-  .then((snapshot) => {
-    let books = [];
-    snapshot.docs.forEach((doc) => {
-      books.push({ ...doc.data(), id: doc.id });
-    });
-    console.log(books);
-  })
-  .catch((err) => {
-    console.log(err.message);
+// get the collection data only once (snapshot at the exact time only)
+// getDocs(colRef)
+//   .then((snapshot) => {
+//     let books = [];
+//     snapshot.docs.forEach((doc) => {
+//       books.push({ ...doc.data(), id: doc.id });
+//     });
+//     console.log(books);
+//   })
+//   .catch((err) => {
+//     console.log(err.message);
+//   });
+
+// Real time listener to changes on the collection
+// and firing the cb function with a snapshot of the updated data
+onSnapshot(colRef, (snapshot) => {
+  let books = [];
+  snapshot.docs.forEach((doc) => {
+    books.push({ ...doc.data(), id: doc.id });
   });
+  console.log(books);
+});
 
 // adding docs
 const addBookForm = document.querySelector(".add");
