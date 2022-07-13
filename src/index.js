@@ -22,7 +22,13 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAUJKVJmrQ8PxDeXYmIG19VcFRo8jHCgBg",
@@ -147,4 +153,38 @@ signupForm.addEventListener("submit", (e) => {
     .catch((err) => {
       console.log(err.message);
     });
+});
+
+// logging in and out
+const logoutButton = document.querySelector(".logout");
+logoutButton.addEventListener("click", () => {
+  signOut(auth)
+    .then(() => {
+      console.log("user signed out");
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+});
+
+const loginForm = document.querySelector(".login");
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const email = loginForm.email.value;
+  const password = loginForm.password.value;
+
+  signInWithEmailAndPassword(auth, email, password)
+    .then((cred) => {
+      console.log("user logged in:", cred.user);
+      loginForm.reset();
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+});
+
+// subscribing to auth changes, function will fire on each login/signup or logout
+onAuthStateChanged(auth, (user) => {
+  console.log("user status changed: ", user);
 });
